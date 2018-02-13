@@ -1,0 +1,14 @@
+{
+  "name": "seithr",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:client",
+    "test:client": "node --experimental-modules ./specs/client/specs.mjs",
+    "test:server": "node --experimental-modules ./specs/server/specs.mjs"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  }
+}
