@@ -1,13 +1,13 @@
 "use strict"
 
 import Event from "/mjs/Event.mjs"
-import EventTarget from "/mjs/EventTarget.mjs"
+import Node from "/mjs/Node.mjs"
 
 const { expect } = chai
 describe("event emitting", () => {
     describe("events", () => {
         it("can be dispatched on a Node object (bubbling, 1 node)", done => {
-            const et = new EventTarget
+            const et = new Node
             const returned = []
 
             const onfoob = e => {
@@ -39,8 +39,8 @@ describe("event emitting", () => {
         })
 
         it("can be dispatched on a Node object (without bubbling)", () => {
-            const a = new EventTarget
-            const b = a.appendChild(new EventTarget)
+            const a = new Node
+            const b = a.appendChild(new Node)
             let bubble = false
             let hit = false
 
@@ -65,8 +65,8 @@ describe("event emitting", () => {
         })
 
         it("can be dispatched on a Node object (bubbling, 2 nodes)", () => {
-            const a = new EventTarget
-            const b = a.appendChild(new EventTarget)
+            const a = new Node
+            const b = a.appendChild(new Node)
             const returned = []
 
             const onfoob = e => {
@@ -199,7 +199,7 @@ describe("event emitting", () => {
 
         it("can be originating from a user action on a dom nodes, then forwarded to a Node object", done => {
             const node = document.createElement("a")
-            const et = new EventTarget
+            const et = new Node
 
             const onforwardedclick = e => {
                 et.removeEventListener("click", onforwardedclick)

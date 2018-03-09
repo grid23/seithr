@@ -2,12 +2,13 @@
 
 import Event from "/mjs/Event.mjs"
 import EventTarget from "/mjs/EventTarget.mjs"
+import Node from "/mjs/Node.mjs"
 
 const { expect } = chai
 describe("event broadcasting", () => {
     describe("events", () => {
         it("can be added/removed to a global events bus with EventTarget::{addBroadcastListener, removeBroadcastListener}; broadcast with EventTarget::broadcastEvent", done => {
-            const et = new EventTarget
+            const et = new Node
             const onfoo = e => {
                 et.removeBroadcastListener("foo", onfoo)
                 expect(e.eventPhase === EventTarget.BROADCAST_PHASE)
@@ -18,10 +19,10 @@ describe("event broadcasting", () => {
         })
 
         it("fire in phase order: capture, at_target, bubble, broadcast", () => {
-            const a = new EventTarget
-            const b = a.appendChild(new EventTarget)
-            const c = b.appendChild(new EventTarget)
-            const d = new EventTarget
+            const a = new Node
+            const b = a.appendChild(new Node)
+            const c = b.appendChild(new Node)
+            const d = new Node
             const returned = []
 
             const oncapture = e => {

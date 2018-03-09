@@ -5,10 +5,8 @@ import Node from "/mjs/Node.mjs"
 
 const { expect } = chai
 describe("class EventTarget", () => {
-    it("inherits from Node", () => {
+    it("is invoked with the new keyword", () => {
         const et = new EventTarget()
-
         expect(et instanceof EventTarget).to.be.true
-        expect(et instanceof Node).to.be.true
     })
 })

@@ -11,7 +11,7 @@ import "./ReadyStateFul.mjs"
 import "./Worker.mjs"
 import "./Communicator.mjs"
 import "./workers--communication.mjs"
-import "./Model.mjs"
+import "./models.mjs"
 import "./Collection.mjs"
 import "./animationFrames.mjs"
 

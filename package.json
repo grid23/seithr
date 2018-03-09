@@ -8,7 +8,8 @@
     "test:server": "node --experimental-modules ./specs/server/specs.mjs"
   },
   "devDependencies": {
+    "@std/esm": "*",
     "chai": "*",
-    "mocha": "*"
+    "mocha": "^5.0.0"
   }
 }

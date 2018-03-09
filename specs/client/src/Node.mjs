@@ -1,5 +1,7 @@
 "use strict"
 
+import EventTarget from "/mjs/EventTarget.mjs"
+import DataNode from "/mjs/DataNode.mjs"
 import Node from "/mjs/Node.mjs"
 
 const { expect } = chai
@@ -8,6 +10,7 @@ describe("class Node", () => {
         const node = new Node()
 
         expect(node instanceof Node).to.be.true
+        expect(node instanceof EventTarget).to.be.true
         expect(node.nodeType === Node.OBJECT_NODE).to.be.true
         expect(node.nodeName === "").to.be.true
         expect(node.nodeValue).to.be.null
@@ -15,19 +18,7 @@ describe("class Node", () => {
     })
 
     it ("can be invoked with specifics type, name, value and readonly", () => {
-        const node = new Node({ type:"MODEL_DATA_NODE", name:"foo", value:"bar", readonly:true })
-
-        const B = class B extends Node {
-            static get FOO_NODE(){ return 15 }
-            constructor(){ super({ type: "FOO_NODE" }) }
-        }
-        const b = new B()
-
-        expect(node.nodeType === Node.MODEL_DATA_NODE).to.be.true
-        expect(b.nodeType === B.FOO_NODE).to.be.true
-        expect(node.nodeName === "foo").to.be.true
-        expect(node.nodeValue === "bar").to.be.true
-        expect(node.readonly).to.be.true
+        throw new Error("write test")
     })
 
 
