@@ -1,7 +1,7 @@
 "use strict"
 
 import DataNode from "/mjs/DataNode.mjs"
-import { ERR_ILLEGAL_CONSTRUCTOR, ERR_INVALID_DATA, ERR_NOT_A_LEAF, ERR_READ_ONLY } from "/mjs/error.mjs"
+import { ERR_ILLEGAL_CONSTRUCTOR, ERR_INVALID_DATA } from "/mjs/error.mjs"
 import EventTarget from "/mjs/EventTarget.mjs"
 import Node from "/mjs/Node.mjs"
 
@@ -14,78 +14,80 @@ describe("DataNode", () => {
     })
 
     it("is created via DataNode.from(seed) (simple objects)", () => {
-        const a = DataNode.from({ foo: "bar" })
+        const a = DataNode.from("foo")
+        const b = DataNode.from(1)
+        const c = DataNode.from(false)
+        const d = DataNode.from(null)
 
-        expect(a instanceof EventTarget).to.be.true
-        expect(a instanceof Node).to.be.true
-        expect(a instanceof DataNode).to.be.true
-        expect(a.nodeType === DataNode.LEAF_NODE).to.be.true
-        expect(a.nodeName === "foo").to.be.true
-        expect(a.nodeValue === "bar").to.be.true
-        expect(a.nodeValue === "bar").to.be.true
-        expect(a.childNodes.length === 0).to.be.true
+        expect( () => DataNode.from(undefined) ).to.throw(TypeError, ERR_INVALID_DATA)
+        expect( () => DataNode.from(NaN) ).to.throw(TypeError, ERR_INVALID_DATA)
+        expect(a.nodeName).to.equal("")
+        expect(a.nodeValue).to.equal("foo")
+        expect(b.nodeName).to.equal("")
+        expect(b.nodeValue).to.equal(1)
+        expect(c.nodeName).to.equal("")
+        expect(c.nodeValue).to.equal(false)
+        expect(d.nodeName).to.equal("")
+        expect(d.nodeValue).to.equal(null)
+    })
 
-        //undefined gets transformed as null
-        //as JSON.stringify([undefined])
-        const b = DataNode.from(["foo", "bar", undefined])
-        expect(b.nodeType === DataNode.FOREST_NODE).to.be.true
-        expect(b.nodeName === "").to.be.true
-        expect(b.nodeValue).to.deep.equal(["foo", "bar", null])
-        expect(b.toJSON()).to.deep.equal(["foo", "bar", null])
-        expect(b.childNodes.length === 3).to.be.true
+    it("is created via DataNode.from(seed) ( iterables & objects )", () => {
+        const a = DataNode.from([0, 1, 2, 3])
+        const b = DataNode.from(new Set([0, 1, 2, 3]))
+        const map = new Map
+        map.set("a", 0)
+        map.set("b", 1)
+        map.set("c", 2)
+        map.set("d", 3)
+        const c = DataNode.from(map)
+        const d = DataNode.from({ a: 0, b:1, c:2, d:3 })
 
-        const c = DataNode.from(null)
-        expect(c.nodeType === DataNode.LEAF_NODE).to.be.true
-        expect(c.nodeName === "").to.be.true
+        expect(a.nodeName).to.equal("")
+        expect(a.nodeValue).to.equal(null)
+        expect(a.childNodes.length).to.equal(4)
+        expect(a.childNodes.map(child => child.nodeValue)).to.deep.equal([0, 1, 2, 3])
+
+        expect(b.nodeName).to.equal("")
+        expect(b.nodeValue).to.equal(null)
+        expect(b.childNodes.length).to.equal(4)
+        expect(b.childNodes.map(child => child.nodeValue)).to.deep.equal([0, 1, 2, 3])
+
+        expect(c.nodeName).to.equal("")
         expect(c.nodeValue).to.equal(null)
-        expect(c.toJSON()).to.equal(null)
-        expect(a.childNodes.length === 0).to.be.true
+        expect(c.childNodes.length).to.equal(4)
+        expect(c.childNodes.map(child => ([child.nodeName, child.nodeValue]))).to.deep.equal([["a", 0], ["b", 1], ["c", 2], ["d", 3]])
 
-        const d = DataNode.from("foo")
-        expect(d.nodeType === DataNode.LEAF_NODE).to.be.true
-        expect(d.nodeName === "").to.be.true
-        expect(d.nodeValue).to.be.eql("foo")
-        expect(d.toJSON()).to.be.eql("foo")
-        expect(a.childNodes.length === 0).to.be.true
-
-        expect(() => DataNode.from(undefined)).to.throw(ERR_INVALID_DATA)
-        expect(() => DataNode.from(function(){})).to.throw(ERR_INVALID_DATA)
+        expect(d.nodeName).to.equal("")
+        expect(d.nodeValue).to.equal(null)
+        expect(d.childNodes.length).to.equal(4)
+        expect(d.childNodes.map(child => ([child.nodeName, child.nodeValue]))).to.deep.equal([["a", 0], ["b", 1], ["c", 2], ["d", 3]])
     })
 
-    it("is created via DataNode.from(seed) (mixed objects)", () => {
-        const a = DataNode.from({ foo: [ undefined, null, 0, "foo", [0, 1], { foo: "bar" } ] })
-        const rv_a = { foo: [ null, null, 0, "foo", [0, 1], { foo: "bar" } ] }
-        expect(a.toJSON()).to.deep.equal(rv_a)
-        expect(a.nodeValue).to.deep.equal(rv_a.foo)
+    it("is created via DataNode.from(seed) ( complex objects )", () => {
+        const a = DataNode.from([{ foo: "bar" }])
+        const b = a.childNodes[0]
+        const c = b.childNodes[0]
 
-        const b = DataNode.from({ foo: { bar: { fu: [{ foo: "bar" }, undefined, undefined, 0, 1] , biz: undefined } } })
-        const rv_b = { foo: { bar: { fu: [{ foo: "bar" }, null, null, 0, 1] } } }
-        expect(b.toJSON()).to.deep.equal(rv_b)
-        expect(b.nodeValue).to.deep.equal(rv_b.foo)
-    })
+        expect(a.nodeName).to.equal("")
+        expect(a.nodeValue).to.equal(null)
+        expect(a.childNodes.length).to.equal(1)
+        expect(b.nodeName).to.equal("")
+        expect(b.nodeValue).to.equal(null)
+        expect(b.childNodes.length).to.equal(1)
+        expect(c.nodeName).to.equal("foo")
+        expect(c.nodeValue).to.equal("bar")
 
-    it("allows nodeValue & nodeName props to be set, only if it doesn't break the tree structure (simple objects)", () => {
-        const a = DataNode.from("foo", { readonly: true })
-        expect(() => a.nodeValue = "bar").to.throw(ERR_READ_ONLY)
-
-        const b = DataNode.from("foo")
-        b.nodeValue = "bar"
-        expect(b.nodeValue === "bar").to.be.true
-
-        const c = DataNode.from({ foo: "bar" })
-        c.nodeValue = { bar: "foo" }
-        expect(c.nodeValue === "foo").to.be.true
-        expect(c.nodeName === "bar").to.be.true
-
-        const d = DataNode.from([ 0, 1, 2 ])
-        expect(() => d.nodeValue = { foo:"bar" }).to.throw(ERR_NOT_A_LEAF)
-
-        const e = DataNode.from({foo: "bar"})
-        e.nodeValue = [ 0, 1, 2 ]
-        expect(e.childNodes.length === 3).to.be.true
-        expect(e.nodeType === DataNode.FOREST_NODE).to.be.true
-        expect(e.nodeValue).to.deep.equal([ 0, 1, 2 ])
-        expect(e.toJSON()).to.deep.equal({ foo: [ 0, 1, 2 ] })
-
+        const d = DataNode.from([{ foo: [ { bar: "foo", foo: "bar" } ] }])
+        const e = d.childNodes[0]
+        const f = e.childNodes[0]
+        expect(f.nodeName).to.equal("foo")
+        expect(f.nodeValue).to.equal(null)
+        expect(f.childNodes.length).to.equal(1)
+        const g = f.childNodes[0]
+        expect(g.childNodes.length).to.equal(2)
+        expect(g.childNodes[0].nodeName).to.equal("bar")
+        expect(g.childNodes[0].nodeValue).to.equal("foo")
+        expect(g.childNodes[1].nodeName).to.equal("foo")
+        expect(g.childNodes[1].nodeValue).to.equal("bar")
     })
 })
