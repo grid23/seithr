@@ -90,4 +90,33 @@ describe("DataNode", () => {
         expect(g.childNodes[1].nodeName).to.equal("foo")
         expect(g.childNodes[1].nodeValue).to.equal("bar")
     })
+
+    describe("DataNode.toJSON(), DataNode.innerContent, DataNode.outerContent", () => {
+        it("returns a structured object from the tree starting from that node", () => {
+            const a = DataNode.from({ foo: { bar: [ 0, 1, 2 ]} })
+            expect(a.childNodes[0].innerContent).to.deep.equal({ bar: [0, 1, 2] })
+            expect(a.outerContent).to.deep.equal({ foo: { bar: [0, 1, 2] } })
+
+            const b = DataNode.from([])
+            const c = b.appendChild(DataNode.from(0))
+            const d = b.appendChild(DataNode.from("bar", { name: "foo"} ))
+
+            expect(b.outerContent).to.deep.equal({
+                0:0, foo: "bar", length: 1
+            })
+
+            const e = c.appendChild(DataNode.from(1))
+            expect(b.outerContent).to.deep.equal({
+                0:[0, 1], foo: "bar", length: 1
+            })
+        })
+    })
+
+    describe("DataNode.toXML(), DataNode.innerXML, DataNode.outerXML", () => {
+        it("returns a structured xml tree starting from that node", () => {
+            const a = DataNode.from({ foo: { bar: [ 0, 1, 2 ]} })
+
+            throw new Error("write test")
+        })
+    })
 })
