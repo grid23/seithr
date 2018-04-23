@@ -1,122 +1,109 @@
 "use strict"
 
-import DataNode from "/mjs/DataNode.mjs"
-import { ERR_ILLEGAL_CONSTRUCTOR, ERR_INVALID_DATA } from "/mjs/error.mjs"
-import EventTarget from "/mjs/EventTarget.mjs"
-import Node from "/mjs/Node.mjs"
+"use strict"
+
+import Model from "/mjs/Model.mjs"
 
 const { expect } = chai
+describe("class Model", () => {
 
-describe("DataNode", () => {
+    describe("legacy tests from korbut", () => {
 
-    it("can't be invoked with the new keyword", () => {
-        expect(() => new DataNode).to.throw(ERR_ILLEGAL_CONSTRUCTOR)
-    })
+        it("should accept an object as base key->value pairs", () => {
+            const m = new Model({foo:"bar", bar:"foo"})
 
-    it("is created via DataNode.from(seed) (simple objects)", () => {
-        const a = DataNode.from("foo")
-        const b = DataNode.from(1)
-        const c = DataNode.from(false)
-        const d = DataNode.from(null)
+            expect(m.data.foo).to.be.equal("bar")
+            expect(m.data.bar).to.be.equal("foo")
+            expect(m.data.bar).to.be.equal("foo")
+            expect(m.getItem("bar")).to.be.equal("foo")
+        })
 
-        expect( () => DataNode.from(undefined) ).to.throw(TypeError, ERR_INVALID_DATA)
-        expect( () => DataNode.from(NaN) ).to.throw(TypeError, ERR_INVALID_DATA)
-        expect(a.nodeName).to.equal("")
-        expect(a.nodeValue).to.equal("foo")
-        expect(b.nodeName).to.equal("")
-        expect(b.nodeValue).to.equal(1)
-        expect(c.nodeName).to.equal("")
-        expect(c.nodeValue).to.equal(false)
-        expect(d.nodeName).to.equal("")
-        expect(d.nodeValue).to.equal(null)
-    })
+        it("should accept a serialized string as base key->value pairs", () => {
+            const m = new Model("foo=bar&bar=foo")
 
-    it("is created via DataNode.from(seed) ( iterables & objects )", () => {
-        const a = DataNode.from([0, 1, 2, 3])
-        const b = DataNode.from(new Set([0, 1, 2, 3]))
-        const map = new Map
-        map.set("a", 0)
-        map.set("b", 1)
-        map.set("c", 2)
-        map.set("d", 3)
-        const c = DataNode.from(map)
-        const d = DataNode.from({ a: 0, b:1, c:2, d:3 })
+            expect(m.data.foo).to.be.equal("bar")
+            expect(m.getItem("foo")).to.be.equal("bar")
+            expect(m.data.bar).to.be.equal("foo")
+            expect(m.getItem("bar")).to.be.equal("foo")
+        })
 
-        expect(a.nodeName).to.equal("")
-        expect(a.nodeValue).to.equal(null)
-        expect(a.childNodes.length).to.equal(4)
-        expect(a.childNodes.map(child => child.nodeValue)).to.deep.equal([0, 1, 2, 3])
+        describe("#setItem", () => {
+            const m = new Model
 
-        expect(b.nodeName).to.equal("")
-        expect(b.nodeValue).to.equal(null)
-        expect(b.childNodes.length).to.equal(4)
-        expect(b.childNodes.map(child => child.nodeValue)).to.deep.equal([0, 1, 2, 3])
+            it("should accept any JSON-compatible type of data", () => {
+                  m.setItem("a", 0)
+                  expect(m.data.a).to.be.equal(0)
+                  expect(m.getItem("a")).to.be.equal(0)
 
-        expect(c.nodeName).to.equal("")
-        expect(c.nodeValue).to.equal(null)
-        expect(c.childNodes.length).to.equal(4)
-        expect(c.childNodes.map(child => ([child.nodeName, child.nodeValue]))).to.deep.equal([["a", 0], ["b", 1], ["c", 2], ["d", 3]])
+                  m.setItem("b", 1)
+                  expect(m.data.b).to.be.equal(1)
+                  expect(m.getItem("b")).to.be.equal(1)
 
-        expect(d.nodeName).to.equal("")
-        expect(d.nodeValue).to.equal(null)
-        expect(d.childNodes.length).to.equal(4)
-        expect(d.childNodes.map(child => ([child.nodeName, child.nodeValue]))).to.deep.equal([["a", 0], ["b", 1], ["c", 2], ["d", 3]])
-    })
+                  m.setItem("c", -1)
+                  expect(m.data.c).to.be.equal(-1)
+                  expect(m.getItem("c")).to.be.equal(-1)
 
-    it("is created via DataNode.from(seed) ( complex objects )", () => {
-        const a = DataNode.from([{ foo: "bar" }])
-        const b = a.childNodes[0]
-        const c = b.childNodes[0]
+                  m.setItem("z", new Number(2))
+                  expect(m.data.z).to.be.equal(2)
+                  expect(m.getItem("z")).to.be.equal(2)
 
-        expect(a.nodeName).to.equal("")
-        expect(a.nodeValue).to.equal(null)
-        expect(a.childNodes.length).to.equal(1)
-        expect(b.nodeName).to.equal("")
-        expect(b.nodeValue).to.equal(null)
-        expect(b.childNodes.length).to.equal(1)
-        expect(c.nodeName).to.equal("foo")
-        expect(c.nodeValue).to.equal("bar")
+                  m.setItem("e", true)
+                  expect(m.data.e).to.be.true
+                  expect(m.getItem("e")).to.be.true
 
-        const d = DataNode.from([{ foo: [ { bar: "foo", foo: "bar" } ] }])
-        const e = d.childNodes[0]
-        const f = e.childNodes[0]
-        expect(f.nodeName).to.equal("foo")
-        expect(f.nodeValue).to.equal(null)
-        expect(f.childNodes.length).to.equal(1)
-        const g = f.childNodes[0]
-        expect(g.childNodes.length).to.equal(2)
-        expect(g.childNodes[0].nodeName).to.equal("bar")
-        expect(g.childNodes[0].nodeValue).to.equal("foo")
-        expect(g.childNodes[1].nodeName).to.equal("foo")
-        expect(g.childNodes[1].nodeValue).to.equal("bar")
-    })
+                  m.setItem("f", false)
+                  expect(m.data.f).to.be.false
+                  expect(m.getItem("f")).to.be.false
 
-    describe("DataNode.toJSON(), DataNode.innerContent, DataNode.outerContent", () => {
-        it("returns a structured object from the tree starting from that node", () => {
-            const a = DataNode.from({ foo: { bar: [ 0, 1, 2 ]} })
-            expect(a.childNodes[0].innerContent).to.deep.equal({ bar: [0, 1, 2] })
-            expect(a.outerContent).to.deep.equal({ foo: { bar: [0, 1, 2] } })
+                  m.setItem("g", new Boolean(1))
+                  expect(m.data.g).to.be.true
+                  expect(m.getItem("g")).to.true
 
-            const b = DataNode.from([])
-            const c = b.appendChild(DataNode.from(0))
-            const d = b.appendChild(DataNode.from("bar", { name: "foo"} ))
+                  m.setItem("h", "string")
+                  expect(m.data.h).to.be.equal("string")
+                  expect(m.getItem("h")).to.be.equal("string")
 
-            expect(b.outerContent).to.deep.equal({
-                0:0, foo: "bar", length: 1
+                  m.setItem("i", new String("string"))
+                  expect(m.data.i).to.be.equal("string")
+                  expect(m.getItem("i")).to.be.equal("string")
+
+                  m.setItem("j", { k: [{l: "string", m: "string"}, { o: "string" }], p: "string"})
+
+                  expect(m.data["j.k.0.l"]).to.be.equal("string")
+                  expect(m.getItem("j.k.0.l")).to.be.equal("string")
+
+                  m.setItem("q", [0])
+                  expect(m.data["q.length"]).to.be.equal(1)
+                  expect(m.getItem("q.0")).to.be.equal(0)
+
+                  m.setItem("r", new Array(2))
+                  expect(m.data["r.length"]).to.be.equal(2)
+                  expect(m.getItem("r.0")).to.be.undefined
             })
+        })
 
-            const e = c.appendChild(DataNode.from(1))
-            expect(b.outerContent).to.deep.equal({
-                0:[0, 1], foo: "bar", length: 1
+        describe("0, null, false, undefined values in dataset", () => {
+            it ("0 should never equal false", done => {
+                const m = new Model
+
+                m.addEventListener("add", function onadd(e){
+                    m.removeEventListener("add", onadd)
+
+                    expect(e.from).to.be.undefined
+                    expect(e.to).to.be.equal(0)
+
+                    m.addEventListener("add", function onadd(e){
+                        expect(e.from).to.be.equal(0)
+                        expect(e.to).to.be.equal(25)
+                        done()
+                    })
+
+                    m.setItem("x", 25)
+                })
+
+                m.setItem("x", 0)
             })
         })
     })
 
-    describe("DataNode.toXML(), DataNode.innerXML, DataNode.outerXML", () => {
-        it("returns a structured xml tree starting from that node", () => {
-            const a = DataNode.from({ foo: { bar: [ 0, 1, 2 ]} })
-
-            throw new Error("write test")
-        })
-    })
 })

@@ -1,7 +1,6 @@
 "use strict"
 
 import EventTarget from "/mjs/EventTarget.mjs"
-import DataNode from "/mjs/DataNode.mjs"
 import Node from "/mjs/Node.mjs"
 
 const { expect } = chai
@@ -15,12 +14,6 @@ describe("class Node", () => {
         expect(node.nodeName === "").to.be.true
         expect(node.nodeValue).to.be.null
     })
-
-    it ("can be invoked with specifics type, name, value and readonly", () => {
-        throw new Error("write test")
-    })
-
-
 
     it("methods {appendChild,insertBefore,removeChild} returns the node being manipulated", () => {
         const a = new Node()
