@@ -15,11 +15,24 @@ describe("class View (legacy tests from ippankiban)", () => {
         chai.expect(v.expression.string).to.equal("")
     })
 
+    it(`extends View`, () => {
+        class V extends View {
+            constructor(model){
+                super(model)
+            }
+
+            get _template(){ return "div > span" }
+        }
+
+        const v = new V
+        document.getElementById("samples").appendChild(v.fragment)
+        chai.expect(v.expression.string).to.equal("div > span")
+        chai.expect(v.root.nodeName).to.equal("DIV")
+    })
+
     it(`new View("span") == new View(new ZExpression("span")) `, () => {
-        console.log('<--------')
         let v = new View("span")
         let w = new View(new ZExpression("span"))
-        console.log('-------->')
         chai.expect(v.expression.string).to.equal("span")
         chai.expect(w.expression.string).to.equal("span")
     })
@@ -52,5 +65,24 @@ describe("class View (legacy tests from ippankiban)", () => {
         chai.expect(v.queryAll("foo").length).to.equal(2)
         chai.expect(v.queryAll("foo")[0].nodeName).to.equal("SPAN")
         chai.expect(v.queryAll("foo")[1].nodeName).to.equal("SPAN")
+    })
+
+    it("model values are injected to the dom immediatly", done => {
+        let v = new View("div[data-foo=$foo].$foo#$foo{$foo}", { foo:"foo" })
+
+        chai.expect(v.root.getAttribute("data-foo") === "foo").to.be.true
+        chai.expect(v.root.className.indexOf("foo") != -1).to.be.true
+        chai.expect(v.root.id == "foo").to.be.true
+        chai.expect(v.root.textContent.indexOf("foo") != -1).to.be.true
+
+        v.model.addEventListener("update", () => setTimeout(() => {
+          chai.expect(v.root.getAttribute("data-foo") === "bar").to.be.true
+          chai.expect(v.root.className.indexOf("bar") != -1).to.be.true
+          chai.expect(v.root.id == "bar").to.be.true
+          chai.expect(v.root.textContent.indexOf("bar") != -1).to.be.true
+          done()
+        }, 100))
+
+        v.model.set("foo", "bar")
     })
 })

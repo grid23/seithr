@@ -14,5 +14,9 @@ import "./models.mjs"
 import "./templates--legacy.mjs"
 import "./views.mjs"
 import "./routers.mjs"
+import "./cookies.mjs"
+import "./cssrules.mjs"
+import "./stylesheets.mjs"
+import "./services.mjs"
 
 mocha.run()

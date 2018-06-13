@@ -1,5 +1,6 @@
 "use strict"
 
+const { APP_USER_PATH } = process.env
 import http2 from "http2"
 import fs from "fs"
 import expose from "../expose"
@@ -16,18 +17,15 @@ const { open, fstat } = fs
 const { resolve:resolvePath } = _path
 const { promisify } = util
 
-export const path = [
-    /^GET\/$/
-  , /^GET\/\?grep=(.*)$/
-]
-export const routeHandler = async ({httpstream, headers, flag}) => new Promise(async (resolve) => {
-    const fd = await promisify(open)(resolvePath(__dirname, "./index-esm.html"), "r")
+export const path = [/^GET\/js\/(.*)$/]
+export const routeHandler = async ({ httpstream, headers, flag, match }) => new Promise(async (resolve) => {
+    const fd = await promisify(open)(resolvePath(APP_USER_PATH, `./${match[0][0]}`), "r")
     const stats = await promisify(fstat)(fd)
 
     httpstream.once("close", () => resolve(1))
     httpstream.respondWithFD(fd, {
         [HTTP2_HEADER_STATUS]: 200
-      , [HTTP2_HEADER_CONTENT_TYPE]: "text/html"
+      , [HTTP2_HEADER_CONTENT_TYPE]: "application/javascript"
       , [HTTP2_HEADER_CONTENT_LENGTH]: stats.size
     })
 })

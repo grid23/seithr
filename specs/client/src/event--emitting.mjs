@@ -14,6 +14,7 @@ describe("event emitting", () => {
                 et.removeEventListener("foo", onfoob)
                 returned.push("bubble")
 
+
                 expect(e.eventPhase === Event.AT_TARGET).to.be.true
                 expect(e.currentTarget == et).to.be.true
                 expect(e.target === et).to.be.true
@@ -135,7 +136,7 @@ describe("event emitting", () => {
             b.addEventListener("foo", onfooat)
 
             const event = new Event("foo")
-            b.dispatchEvent(event)
+            b.dispatchEvent(event.originalEvent)
 
             // in order of phases (capture then bubble)
             expect(returned[0]).to.eql("capture")
@@ -164,7 +165,7 @@ describe("event emitting", () => {
             a.addEventListener("foo", onfooc, true)
 
             const event = new Event("foo")
-            a.dispatchEvent(event)
+            a.dispatchEvent(event.originalEvent)
 
             // in order of addEventListener invocations
             expect(returned[0]).to.eql("bubble")
@@ -191,7 +192,7 @@ describe("event emitting", () => {
             b.addEventListener("foo", onfoo)
 
             const event = new Event("foo", { bubbles: false })
-            b.dispatchEvent(event)
+            b.dispatchEvent(event.originalEvent)
 
             expect(bubble).to.be.false
             expect(hit).to.be.true

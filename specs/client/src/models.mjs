@@ -106,4 +106,16 @@ describe("class Model", () => {
         })
     })
 
+    it("removing a key also remove it from Model::raw", () => {
+        const m = new Model
+
+        m.set("foo", "bar")
+        expect(m.get("foo") == "bar").to.be.true
+        expect(m.raw.foo == "bar").to.be.true
+        m.remove("foo")
+        expect(m.get("foo") == undefined).to.be.true
+        expect(m.raw.foo == undefined).to.be.true
+
+    })
+
 })

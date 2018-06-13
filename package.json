@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-modules ./specs/client/specs.mjs"
+      "test": "node --experimental-modules ./specs/client/specs.mjs"
+    , "test:webpack": "node --experimental-modules ./index.js --wp"
   },
   "devDependencies": {
     "chai": "*",
+    "glob-watcher": "^5.0.1",
     "mocha": "^5.0.0"
   },
   "dependencies": {}
