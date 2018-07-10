@@ -5,7 +5,6 @@ const { dirname, resolve:resolvePath, join:joinPath } = require("path")
 const { homedir, tmpdir } = require("os")
 const { name:appname } = require("./package.json")
 
-console.log(process)
 const cwd = resolvePath(process.cwd(), dirname(process.mainModule.filename))
 
 module.exports = {

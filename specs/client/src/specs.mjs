@@ -18,5 +18,6 @@ import "./cookies.mjs"
 import "./cssrules.mjs"
 import "./stylesheets.mjs"
 import "./services.mjs"
+import "./traits.mjs"
 
 mocha.run()
