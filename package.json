@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-modules ./specs/client/specs.mjs",
-    "test:webpack": "node --experimental-modules ./index.js --wp"
+    "test:webpack": "node --experimental-modules ./bundle.js --wp"
   },
   "devDependencies": {
     "chai": "*",

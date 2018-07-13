@@ -1,62 +1,33 @@
 "use strict"
 
-const { dirname, resolve:resolvePath, join:joinPath } = require("path")
-const { fork } = require("child_process")
-const watch = require("glob-watcher")
-
-const config = async () => new Promise(resolve => {
-    const config = require("./config")
-
-    Object.keys(config)
-      .forEach(variable => process.env[variable.toUpperCase()] = config[variable])
-
-    resolve()
-})
-
-const bundle = async () => {
-    const file = process.env["BUNDLER"]
-    let cp
-    const start = async () => {
-        if ( cp )
-          cp.kill()
-
-        cp = fork(file, process.argv.slice(2), { env: process.env })
-        process.addListener("SIGINT", () => cp.kill())
-
-        return cp
-    }
-
-    watch([`${dirname(file)}/**/*.js`], start)
-    await start()
-}
-
-const test = async () => {
-    const file = process.env["SPECS"]
-    let cp
-    const start = async () => {
-        if ( cp )
-          cp.kill()
-
-        cp = fork(file, process.argv.slice(2), { env: process.env })
-        process.addListener("SIGINT", () => cp.kill())
-
-        return cp
-    }
-
-    watch([`${dirname(file)}/**/*.js`], start)
-    await start()
-}
-
-const main = async () => {
-    process.addListener("exit", code => console.log(`app exiting (${process.pid})`))
-    process.addListener("SIGINT", () => process.exit(0))
-    process.addListener("SIGTERM", () => process.exit(0))
-    await config()
-    const { APPNAME } = process.env
-
-    await bundle()
-    await test()
-}
-
-main()
-  .catch(e => console.error(e))
+export cancelAnimationFrame from "./lib/cancelAnimationFrames.mjs"
+export Cookie from "./lib/Cookie.mjs"
+export CSSConditionalRule from "./lib/CSSConditionalRule.mjs"
+export CSSMediaRule from "./lib/CSSMediaRule.mjs"
+export CSSRule from "./lib/CSSRule.mjs"
+export domReady from "./lib/domReady"
+export error from "./lib/error.mjs"
+export Event from "./lib/Event.mjs"
+export EventDispatcher from "./lib/EventDispatcher.mjs"
+export EventTarget from "./lib/EventTarget.mjs"
+export isNative from "./lib/isNative.mjs"
+export isSameDomain from "./lib/isSameDomain.mjs"
+export Model from "./lib/Model.mjs"
+export Node from "./lib/Node.mjs"
+export ReadyStateFul from "./lib/ReadyStateFul.mjs"
+export requestAnimationFrames from "./lib/requestAnimationFrames.mjs"
+export Route from "./lib/Route.mjs"
+export RouteDispatcher from "./lib/RouteDispatcher.mjs"
+export Router from "./lib/Router.mjs"
+export Serializer from "./lib/Serializer.mjs"
+export Service from "./lib/Service.mjs"
+export singleton from "./lib/singleton.mjs"
+export store from "./lib/store.mjs"
+export Stylesheet from "./lib/Stylesheet.mjs"
+export toType from "./lib/toType.mjs"
+export trait from "./lib/trait.mjs"
+export UID from "./lib/UID.mjs"
+export View from "./lib/View.mjs"
+export ZExpression from "./lib/ZExpression.mjs"
+export ZParser from "./lib/ZParser.mjs"
+export ZTemplate from "./lib/ZTemplate.mjs"

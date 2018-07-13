@@ -60,7 +60,6 @@ describe ("ZExpression & ZParser (legacy tests from ippankiban)", ()=>{
 
             it("group (var)", () => {
                 let r = ZParser.parse("(span{$foo})", {foo: "bar"})
-                console.log(r.tree.childNodes[0].textContent, r.vars, r.model.data, r.updates)
                 chai.expect(r.tree.nodeType).to.equal(Node.DOCUMENT_FRAGMENT_NODE)
                 chai.expect(r.tree.childNodes.length).to.equal(1)
                 chai.expect(r.tree.childNodes[0].textContent).to.equal("bar")

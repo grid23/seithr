@@ -6,12 +6,6 @@ const { expect } = chai
 
 describe("ReadyStateFul", () => {
     it("", () => {
-
-    })
-})
-
-describe("ReadyStateChange", () => {
-    it("", () => {
-
+        throw new Error("test")
     })
 })
