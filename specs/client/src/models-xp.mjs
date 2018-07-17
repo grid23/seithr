@@ -26,7 +26,7 @@ describe("class Model2 (experimental)", () => {
         expect(q.io === null).to.be.true
     })
 
-    it("only one active object proxy can exist at a time, proxy survives for a tick before when revoked", done => {
+    it("only one active object proxy can exist at a time, proxy survives for a tick when revoked", done => {
         const m = new Model()
         m.io = { foo: "bar", fu: { bar: "foo" } }
         const x = m.io
