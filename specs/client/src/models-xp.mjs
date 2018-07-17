@@ -1,6 +1,7 @@
 "use strict"
 import Model from "/mjs/Model2.mjs"
 
+window.Model = Model
 const { expect } = chai
 
 describe("class Model2 (experimental)", () => {
@@ -25,7 +26,7 @@ describe("class Model2 (experimental)", () => {
         expect(q.io === null).to.be.true
     })
 
-    it("only one object proxy can exist at a time", done => {
+    it("only one active object proxy can exist at a time, proxy survives for a tick before when revoked", done => {
         const m = new Model()
         m.io = { foo: "bar", fu: { bar: "foo" } }
         const x = m.io
@@ -39,6 +40,15 @@ describe("class Model2 (experimental)", () => {
         }, 4)
     })
 
+    it("allows object to be manipulated freely", () => {
+        const m = new Model
+
+        m.io = { foo: ["b", "a", "r"], bar: { f:"f", o:"o", b:"b", a:"a", r:"" } }
+        expect(() => m.io.foo[0] = "B").to.not.throw()
+        expect([...m.io.foo].join("") === "Bar").to.be.true
+        expect(Object.keys(m.io.bar).join("") === "fobar")
+    })
+
     it("model have a global hidden name and can have a set global name", () => {
         const m = new Model("foo")
         m.io = { foo: "bar" }
@@ -46,7 +56,6 @@ describe("class Model2 (experimental)", () => {
         chai.expect(Model.io[m.valueOf()].foo === "bar").to.be.true
         chai.expect(Model.io["" + m].foo === "bar").to.be.true
     })
-
 
     it("event modelchange is fired when a value is set", done => {
         const m = new Model
@@ -65,5 +74,56 @@ describe("class Model2 (experimental)", () => {
         })
         m.io = { foo: "bar", fu:null }
         m.io.fu = { fu: "bar" }
+    })
+
+    it("set, defineProperty, deleteProperty provoke a change event", done => {
+        const m = new Model
+
+        let i = 0
+        m.addEventListener(Model.CHANGE, ({target:m}) => {
+            i += 1
+
+            if ( i == 1 )
+              expect(m.io.foo === "bar").to.be.true
+            if ( i == 2 )
+              expect(m.io.fu === "bar").to.be.true
+            if ( i == 3 )
+              expect(m.io.fu === undefined).to.be.true,
+              done()
+        })
+
+        m.io = {foo: "bar"}
+        Object.defineProperty(m.io, "fu", { enumerable: true, configurable:true, value: "bar" })
+        delete m.io.fu
+    })
+
+    it("model can be sealed, preventing any change", () => {
+        const m = new Model
+
+        m.io = { foo: "bar" }
+        m.seal()
+
+        m.io.foo = "foo"
+        expect(m.io.foo === "bar").to.be.true
+    })
+
+    it("model can be strictly sealed, preventing any change and throwing errors when attempting changes", () => {
+        const m = new Model
+
+        m.io = { foo: "bar" }
+        m.seal(true)
+
+        expect(() => m.io.foo = "foo").to.throw()
+    })
+
+    it("model.silentio can be used to modify data without events", () => {
+        const m = new Model
+        let i = 0
+        m.addEventListener(Model.CHANGE, e => i+=1)
+        m.silentio = { foo: "bar" }
+        m.silentio = { bar: "foo" }
+
+        expect(m.io.bar === "foo").to.be.true
+        expect(i==0).to.be.true
     })
 })
