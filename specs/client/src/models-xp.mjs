@@ -25,7 +25,7 @@ describe("class Model2 (experimental)", () => {
         expect(q.io === null).to.be.true
     })
 
-    it("model.io and and subsequent chaining of objects are only alive for one frame", done => {
+    it("only one object proxy can exist at a time", done => {
         const m = new Model()
         m.io = { foo: "bar", fu: { bar: "foo" } }
         const x = m.io
@@ -33,8 +33,8 @@ describe("class Model2 (experimental)", () => {
         const z = m.io.fu
         setTimeout(() => {
             expect(() => x.foo).to.throw()
-            expect(() => y.foo).to.not.throw()
-            expect(() => z.bar).to.throw()
+            expect(() => y.foo).to.not.throw() // end-value are not proxied
+            expect(() => z.bar).to.not.throw()
             done()
         }, 4)
     })
@@ -44,7 +44,26 @@ describe("class Model2 (experimental)", () => {
         m.io = { foo: "bar" }
         chai.expect(Model.io.foo.foo === "bar").to.be.true
         chai.expect(Model.io[m.valueOf()].foo === "bar").to.be.true
+        chai.expect(Model.io["" + m].foo === "bar").to.be.true
+    })
 
 
+    it("event modelchange is fired when a value is set", done => {
+        const m = new Model
+        let i = 0
+        m.addEventListener(Model.CHANGE, ({target:m}) => {
+            i += 1
+            if ( i ===1 )
+              expect(m.io.foo === "bar").to.be.true
+
+            if ( i === 2 )
+              expect(m.io.fu.fu === "bar").to.be.true,
+              done()
+
+            if ( i > 2 )
+              throw new Error("too many events")
+        })
+        m.io = { foo: "bar", fu:null }
+        m.io.fu = { fu: "bar" }
     })
 })

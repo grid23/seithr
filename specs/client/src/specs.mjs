@@ -20,6 +20,7 @@ import "./services.mjs"
 import "./singletons.mjs"
 import "./traits.mjs"
 import "./readyStateFuls.mjs"
+import "./uids.mjs"
 import "./models-xp.mjs"
 
 mocha.run()
