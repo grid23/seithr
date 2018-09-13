@@ -22,5 +22,6 @@ import "./traits.mjs"
 import "./readyStateFuls.mjs"
 import "./uids.mjs"
 import "./models-xp.mjs"
+import "./views-xp.mjs"
 
 mocha.run()

@@ -2,6 +2,7 @@
 
 import Event from "/mjs/Event.mjs"
 import EventTarget from "/mjs/EventTarget.mjs"
+import singleton from "/mjs/singleton.mjs"
 
 const { expect } = chai
 describe("class Event", () => {
@@ -69,5 +70,33 @@ describe("class Event", () => {
         }
         et.addEventListener("foo", onfoo)
         et.dispatchEvent(new Event("foo"))
+    })
+
+    describe("practical test 1", () => {
+        const ET = singleton(class extends EventTarget {
+            static addEventListener(...args){ return new ET().addEventListener(...args) }
+            static removeEventListener(...args){ return new ET().removeEventListener(...args) }
+            static dispatchEvent(...args){ return new ET().dispatchEvent(...args) }
+        })
+
+        let i = 0
+        class X extends Event {
+            constructor(dict) {
+                i+=1
+                console.log(dict, i)
+
+                super(dict.type)
+            }
+        }
+
+        it ("event should only be intialized once", done => {
+            ET.addEventListener("test", e => {
+                setTimeout(() => {
+                    expect(i === 1).to.be.true
+                    done()
+                }, 200)
+            })
+            ET.dispatchEvent(new X({ type: "test" }))
+        })
     })
 })

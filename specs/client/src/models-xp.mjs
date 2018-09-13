@@ -50,7 +50,7 @@ describe("class Model2 (experimental)", () => {
     })
 
     it("model have a global hidden name and can have a set global name", () => {
-        const m = new Model("foo")
+        const m = new Model({ref:"foo"})
         m.io = { foo: "bar" }
         chai.expect(Model.io.foo.foo === "bar").to.be.true
         chai.expect(Model.io[m.valueOf()].foo === "bar").to.be.true
@@ -125,5 +125,25 @@ describe("class Model2 (experimental)", () => {
 
         expect(m.io.bar === "foo").to.be.true
         expect(i==0).to.be.true
+    })
+
+    describe("chained models", () => {
+        it("requests flow to model parent nodes (with overflow=true(default))", () => {
+            const a = new Model
+            const b = a.appendChild(new Model)
+            const b2 = a.appendChild(new Model({ overflow: false }))
+            const c = b.appendChild(new Model)
+            const d = a.appendChild(new Model)
+            a.io = { a: { b: { c: { d: { e: "foo" } } } } }
+            b.io = { a: { b: {} } }
+            b2.io = { a: { b: {} } }
+            c.io = { a: {} }
+            d.io = { foo: {} }
+
+            expect(b.io.a.b.c.d.e === "foo").to.be.true
+            expect(b2.io.a.b.c).to.be.undefined
+            expect(c.io.a.b.c.d.e === "foo").to.be.true
+            expect(d.io.foo.x).to.be.undefined
+        })
     })
 })
