@@ -1,7 +1,6 @@
 "use strict"
-import Model from "/mjs/Model2.mjs"
+import Model, {events} from "/mjs/Model2.mjs"
 
-window.Model = Model
 const { expect } = chai
 
 describe("class Model2 (experimental)", () => {
@@ -60,7 +59,7 @@ describe("class Model2 (experimental)", () => {
     it("event modelchange is fired when a value is set", done => {
         const m = new Model
         let i = 0
-        m.addEventListener(Model.CHANGE, ({target:m}) => {
+        m.addEventListener(events.modelchange, ({target:m}) => {
             i += 1
             if ( i ===1 )
               expect(m.io.foo === "bar").to.be.true
@@ -80,7 +79,7 @@ describe("class Model2 (experimental)", () => {
         const m = new Model
 
         let i = 0
-        m.addEventListener(Model.CHANGE, ({target:m}) => {
+        m.addEventListener(events.modelchange, ({target:m}) => {
             i += 1
 
             if ( i == 1 )
@@ -119,7 +118,7 @@ describe("class Model2 (experimental)", () => {
     it("model.silentio can be used to modify data without events", () => {
         const m = new Model
         let i = 0
-        m.addEventListener(Model.CHANGE, e => i+=1)
+        m.addEventListener(events.modelchange, e => i+=1)
         m.silentio = { foo: "bar" }
         m.silentio = { bar: "foo" }
 
@@ -144,6 +143,21 @@ describe("class Model2 (experimental)", () => {
             expect(b2.io.a.b.c).to.be.undefined
             expect(c.io.a.b.c.d.e === "foo").to.be.true
             expect(d.io.foo.x).to.be.undefined
+        })
+    })
+
+    describe("meta", () => {
+        it("model.m{...} returns a description of the request, not the value", () => {
+            const m = new Model
+
+            m.io = { foo: "bar" }
+
+            expect(m.m.model === m).to.be.true
+            expect(m.m.path.length == 0).to.be.true
+            expect(m.m.foo.model === m).to.be.true
+            expect(m.m.foo.path.length == 1 && m.m.foo.path[0] === "foo").to.be.true
+            expect(m.m.foo.bar.model === m).to.be.true
+            expect(m.m.foo.bar.path.length == 2 && m.m.foo.bar.path[0] === "foo").to.be.true
         })
     })
 })
