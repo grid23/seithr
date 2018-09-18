@@ -27,7 +27,7 @@ describe("View.expression", () => {
         const m = new Model
         const e = View.expression`div{${m.m.foo.bar}}`
 
-        expect(e === `div{{foo.bar∈${m}}}`).to.be.true
+        expect(e === `div{⌊foo.bar∈${m}⌉}`).to.be.true
     })
 
     it("View.expression`div + ${View}`", () => {
@@ -173,13 +173,87 @@ describe("Parser2 (experimental)", () => {
         const m = new Model
         m.io = { foo: "abc", bar: "def" }
 
-        console.log("-----------")
         const p = Parser.parse(expression`div#foo-${m.m.foo}-bar-${m.m.bar}`)
-        console.log(p.fragment.childNodes[0].getAttribute("id"))
         expect(p.fragment.childNodes[0].getAttribute("id") === "foo-abc-bar-def").to.be.true
     })
 
+    it("ZParser.parse(div.foo)", () => {
+        const p = Parser.parse(expression`div.foo`)
 
+        expect(p.fragment.childNodes[0].getAttribute("class") === "foo").to.be.true
+    })
+
+    it("ZParser.parse(div.foo.bar)", () => {
+        const p = Parser.parse(expression`div.foo.bar`)
+
+        expect(p.fragment.childNodes[0].getAttribute("class") === "foo bar").to.be.true
+    })
+
+    it("ZParser.parse(div.${model.io.value})", () => {
+        const m = new Model
+        m.io = { foo: "abc" }
+
+        const p = Parser.parse(expression`div.${m.m.foo}`)
+
+        expect(p.fragment.childNodes[0].getAttribute("class") === "abc").to.be.true
+    })
+
+    it("ZParser.parse(div.${model.m.value})", () => {
+        const m = new Model
+        m.io = { foo: "abc" }
+
+        const p = Parser.parse(expression`div.${m.m.foo}`)
+
+        expect(p.fragment.childNodes[0].getAttribute("class") === "abc").to.be.true
+    })
+
+    it("ZParser.parse(div.${model.m.value}.${model.m.value})", () => {
+        const m = new Model
+        m.io = { foo: "abc", bar:"def" }
+
+        const p = Parser.parse(expression`div.${m.m.foo}.${m.m.bar}`)
+
+        expect(p.fragment.childNodes[0].getAttribute("class") === "abc def").to.be.true
+    })
+
+    it("ZParser.parse(div.${model.m.value}.${model.m.value}.pqr)", () => {
+        const m = new Model
+        m.io = { foo: "abc def", bar:"ghi jkl mno" }
+
+        const p = Parser.parse(expression`div.${m.m.foo}.${m.m.bar}.pqr`)
+
+        //expect(p.fragment.childNodes.length == 1).to.be.true
+        expect(p.fragment.childNodes[0].getAttribute("class") === "abc def ghi jkl mno pqr").to.be.true
+    })
+
+    it("ZParser.parse(div{hello world!})", () => {
+        const p = Parser.parse(expression`div{hello world!}`)
+
+        expect(p.fragment.childNodes[0].textContent === "hello world!").to.be.true
+    })
+
+    it("ZParser.parse(div{{hello world!}})", () => {
+        const p = Parser.parse(expression`div{{hello world!}}`)
+
+        expect(p.fragment.childNodes[0].textContent === "hello world!").to.be.true
+    })
+
+    it("ZParser.parse(div{hello ${m.m.value}})", () => {
+        const m = new Model
+        m.io = { world: "world" }
+        const p = Parser.parse(expression`div{hello ${m.m.world}!}`)
+
+        expect(p.fragment.childNodes[0].textContent === "hello world!").to.be.true
+    })
+
+    it("ZParser.parse(div{hello }{${m.m.value}})", () => {
+        const m = new Model
+        m.io = { world: "world" }
+        const p = Parser.parse(expression`div{hello }{${m.m.world}!}`)
+
+        expect(p.fragment.childNodes[0].childNodes.length == 2).to.be.true
+        expect(p.fragment.childNodes[0].textContent === "hello world!").to.be.true
+    })
 })
 
 describe("View2 (experimental)", () => {
