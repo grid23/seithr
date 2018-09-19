@@ -314,5 +314,42 @@ describe("Parser2 (experimental)", () => {
 })
 
 describe("View2 (experimental)", () => {
+    it("new View({ props: {foo:`bar`} })", () => {
+        const v = new View({ props: { foo: "bar" } })
 
+        expect(v.props.foo === "bar")
+    })
+
+    it("new View({ expression: expresion`div>span@span{hello world}` })", () => {
+        const v = new View({ expression: expression`div + div>span@span{hello world}` })
+
+        expect(v.node.root.tagName === "DIV").to.be.true
+        expect(v.nodes.root.length == 2).to.be.true
+        expect(v.node.span.tagName === "SPAN").to.be.true
+    })
+
+    it("updates", () => {
+        const m = new Model
+        const n = new Model
+        m.io = { hello: "hello", classname: "foo" }
+        n.io = { world: "world", classname: "bar" }
+        const v = new View({ expression: expression`div.${m.m.classname}>span.${n.m.classname}@span{${m.m.hello} ${n.m.world}}` })
+
+        expect(v.node.root.classList.contains("foo")).to.be.true
+        expect(v.node.span.classList.contains("bar")).to.be.true
+        expect(v.node.span.textContent === "hello world").to.be.true
+        console.log(v.node.root.outerHTML)
+
+        m.io.hello = "guten"
+        m.io.classname = "fu"
+        n.io.world = "tag"
+        n.io.classname = "biz"
+
+        expect(v.node.span.textContent === "guten tag").to.be.true
+        expect(v.node.root.classList.contains("foo")).to.be.false
+        expect(v.node.span.classList.contains("bar")).to.be.false
+        expect(v.node.root.classList.contains("fu")).to.be.true
+        expect(v.node.span.classList.contains("biz")).to.be.true
+        console.log(v.node.root.outerHTML)
+    })
 })
