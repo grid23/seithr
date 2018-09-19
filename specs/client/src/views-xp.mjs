@@ -290,6 +290,27 @@ describe("Parser2 (experimental)", () => {
         expect(p.refs["ul"][0].childNodes[1].nodeName === "LI").to.be.true
         expect(p.refs["p"].length === 4).to.be.true
     })
+
+    it("ZParser.parse(ul > ${A} + ${B.xWith(args)})", () => {
+        const m = new Model
+        m.io = { hello: "hello", world: "world" }
+        class A extends View {
+            get template(){ return expression`li@li{${m.m.hello}}` }
+        }
+        class B extends View {
+            get template(){ return expression`li@li{${this.props.world}}` }
+        }
+
+        const p = Parser.parse(expression`ul@ul > ${A} + ${B.xWith({ props: {world: m.io.world} })}`)
+
+        expect(p.refs["root"].length == 1).to.be.true
+        expect(p.refs["root"][0] === p.refs["ul"][0]).to.be.true
+        expect(p.refs["ul"][0].childNodes.length == 2).to.be.true
+        expect(p.refs["ul"][0].childNodes[0].nodeName === "LI").to.be.true
+        expect(p.refs["ul"][0].childNodes[1].nodeName === "LI").to.be.true
+        expect(p.refs["ul"][0].childNodes[0].textContent === "hello").to.be.true
+        expect(p.refs["ul"][0].childNodes[1].textContent === "world").to.be.true
+    })
 })
 
 describe("View2 (experimental)", () => {
