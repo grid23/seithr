@@ -9,7 +9,7 @@ const { expect } = chai
 describe("View.expression", () => {
     it("View.expression`...`, View.expression(...)", () => {
         const e = View.expression`div{${"bar"}}`
-        const f = View.expression("div{bar}")
+        const f = View.x("div{bar}")
 
         expect(e === "div{bar}").to.be.true
         expect(f === "div{bar}").to.be.true
@@ -35,6 +35,14 @@ describe("View.expression", () => {
         class W extends V {}
         const e = View.expression`div + ${W}`
 
+        expect(e === `div + |${W}|`).to.be.true
+    })
+
+    it("View.expression`div + ${View.expressWith(...args)}`", () => {
+        class V extends View {}
+        class W extends V {}
+        const e = View.x`div + ${W.xWith("foo", "bar")}`
+        console.log(e, "   ", `div + |${W}|`)
         expect(e === `div + |${W}|`).to.be.true
     })
 })
@@ -253,6 +261,34 @@ describe("Parser2 (experimental)", () => {
 
         expect(p.fragment.childNodes[0].childNodes.length == 2).to.be.true
         expect(p.fragment.childNodes[0].textContent === "hello world!").to.be.true
+    })
+
+    it("WARN: ZParser.parse(div{hello }{{${m.m.value}})", done => {
+        const m = new Model
+        m.io = { world: "world" }
+
+        console.warn = function(old){
+            return function(...args){
+                console.warn = old
+                console.warn(...args)
+                done()
+            }
+        }(console.warn)
+        Parser.parse(expression`div{hello }{{${m.m.world}!}}`)
+    })
+
+    it("ZParser.parse(ul > (li > span > (p@p+p@p)) + (li > span > (p@p + p@p)))", () => {
+        const m = new Model
+        m.io = { world: "world" }
+
+        const p = Parser.parse(expression`ul@ul > (li > span > (p@p+p@p)) + (li > span > (p@p + p@p))`)
+
+        expect(p.refs["root"].length == 1).to.be.true
+        expect(p.refs["root"][0] === p.refs["ul"][0]).to.be.true
+        expect(p.refs["ul"][0].childNodes.length == 2).to.be.true
+        expect(p.refs["ul"][0].childNodes[0].nodeName === "LI").to.be.true
+        expect(p.refs["ul"][0].childNodes[1].nodeName === "LI").to.be.true
+        expect(p.refs["p"].length === 4).to.be.true
     })
 })
 
