@@ -338,7 +338,6 @@ describe("View2 (experimental)", () => {
         expect(v.node.root.classList.contains("foo")).to.be.true
         expect(v.node.span.classList.contains("bar")).to.be.true
         expect(v.node.span.textContent === "hello world").to.be.true
-        console.log(v.node.root.outerHTML)
 
         m.io.hello = "guten"
         m.io.classname = "fu"
@@ -350,6 +349,5 @@ describe("View2 (experimental)", () => {
         expect(v.node.span.classList.contains("bar")).to.be.false
         expect(v.node.root.classList.contains("fu")).to.be.true
         expect(v.node.span.classList.contains("biz")).to.be.true
-        console.log(v.node.root.outerHTML)
     })
 })
