@@ -302,7 +302,7 @@ describe("Parser2 (experimental)", () => {
         }
 
         const p = Parser.parse(expression`ul@ul > ${A} + ${B.xWith({ props: {world: m.io.world} })}`)
-
+        console.log(p.refs["root"][0].outerHTML)
         expect(p.refs["root"].length == 1).to.be.true
         expect(p.refs["root"][0] === p.refs["ul"][0]).to.be.true
         expect(p.refs["ul"][0].childNodes.length == 2).to.be.true
