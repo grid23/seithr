@@ -27,7 +27,7 @@ describe("View.expression", () => {
         const m = new Model
         const e = View.expression`div{${m.m.foo.bar}}`
 
-        expect(e === `div{⌊foo.bar∈${m}⌉}`).to.be.true
+        expect(e === `div{⌊.foo.bar∈${m}⌉}`).to.be.true
     })
 
     it("View.expression`div + ${View}`", () => {
@@ -38,12 +38,40 @@ describe("View.expression", () => {
         expect(e === `div + |${W}|`).to.be.true
     })
 
-    it("View.expression`div + ${View.expressWith(...args)}`", () => {
+    it("View.expression`div + ${View.expressWith(...args)}`", done => {
         class V extends View {}
-        class W extends V {}
+        class W extends V {
+            constructor(...args){
+                super()
+                expect(args.length === 2).to.be.true
+                expect(args[0] === "foo").to.be.true
+                expect(args[1] === "bar").to.be.true
+
+                done()
+            }
+        }
         const e = View.x`div + ${W.xWith("foo", "bar")}`
-        console.log(e, "   ", `div + |${W}|`)
-        expect(e === `div + |${W}|`).to.be.true
+        Parser.parse(e)
+    })
+
+    it("View.expression`div{${model.m.value[0]}}`", () => {
+        const x = [0]
+        const m = new Model
+        m.io = ["foo", "bar"]
+        const e = View.x`div{${m.m[0]}}`
+
+        expect(e === `div{⌊["0"]∈${m}⌉}`).to.be.true
+        expect(Parser.parse(e).fragment.childNodes[0].textContent === "foo")
+    })
+
+    it("View.expression`div{${model.m.value.0}}` (illegal property name management)", () => {
+        const x = 0
+        const m = new Model
+        m.io = ["foo", "bar"]
+        const e = View.x`div{${m.m[x]}}`
+
+        expect(e === `div{⌊["0"]∈${m}⌉}`).to.be.true
+        expect(Parser.parse(e).fragment.childNodes[0].textContent === "foo")
     })
 })
 
@@ -172,8 +200,8 @@ describe("Parser2 (experimental)", () => {
         const m = new Model
         m.io = { foo: "abc" }
 
-        const p = Parser.parse(expression`div#${m.m.foo}`)
-
+        const e = expression`div#${m.m.foo}`
+        const p = Parser.parse(e)
         expect(p.fragment.childNodes[0].getAttribute("id") === "abc").to.be.true
     })
 
@@ -302,7 +330,7 @@ describe("Parser2 (experimental)", () => {
         }
 
         const p = Parser.parse(expression`ul@ul > ${A} + ${B.xWith({ props: {world: m.io.world} })}`)
-        console.log(p.refs["root"][0].outerHTML)
+
         expect(p.refs["root"].length == 1).to.be.true
         expect(p.refs["root"][0] === p.refs["ul"][0]).to.be.true
         expect(p.refs["ul"][0].childNodes.length == 2).to.be.true
@@ -310,6 +338,25 @@ describe("Parser2 (experimental)", () => {
         expect(p.refs["ul"][0].childNodes[1].nodeName === "LI").to.be.true
         expect(p.refs["ul"][0].childNodes[0].textContent === "hello").to.be.true
         expect(p.refs["ul"][0].childNodes[1].textContent === "world").to.be.true
+    })
+
+    it("scope of evaluation (=> evaluation shouldn't overflow to global scope)", () => {
+        window.x = location.href
+        const m = new Model
+        m.io = { a: 0, b: 0.1, c: "x" , d: true, e: false }
+        const p = Parser.parse(expression`div[id=${m.m.c}]`)
+        const q = Parser.parse(expression`div[foo=${m.m.d}]`)
+        const r = Parser.parse(expression`div[foo=${m.m.e}]`)
+        const s = Parser.parse(expression`div[foo=${m.m.a}]`)
+        const t = Parser.parse(expression`div[foo=${m.m.b}]`)
+
+        expect(p.fragment.childNodes[0].getAttribute("id") === "x").to.be.true
+        expect(q.fragment.childNodes[0].getAttribute("foo") === "true").to.be.true
+        expect(r.fragment.childNodes[0].getAttribute("foo") === "false").to.be.true
+        expect(s.fragment.childNodes[0].getAttribute("foo") === "0").to.be.true
+        expect(t.fragment.childNodes[0].getAttribute("foo") === "0.1").to.be.true
+
+        //TODO find case where value ends up being a boolean or number, and not a string
     })
 })
 
