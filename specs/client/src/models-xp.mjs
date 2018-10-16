@@ -25,6 +25,13 @@ describe("class Model2 (experimental)", () => {
         expect(q.io === null).to.be.true
     })
 
+    it ("hook: model.hook.prop = function(){}", () => {
+        const m = new Model
+        m.io = { bar: "bar" }
+        m.hook.foo = function(){ return this.io.bar }
+        expect(m.hook.foo === "bar").to.be.true
+    })
+
     it("only one active object proxy can exist at a time, proxy survives for a tick when revoked", done => {
         const m = new Model()
         m.io = { foo: "bar", fu: { bar: "foo" } }
