@@ -12,6 +12,8 @@ import "./utils"
 import "./css"
 import "./animationFrames"
 
+import "./graphs"
+
 export const run = () => {
     mocha.run()
 }

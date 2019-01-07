@@ -14,6 +14,7 @@ export default async () => new Promise(resolve => {
       , env: resolvePath(process.env.CWD, "./lib/env")
       , errors: resolvePath(process.env.CWD, "./lib/errors")
       , events: resolvePath(process.env.CWD, "./lib/events")
+      , graph: resolvePath(process.env.CWD, "./lib/graph")
       , models: resolvePath(process.env.CWD, "./lib/models")
       , nodes: resolvePath(process.env.CWD, "./lib/nodes")
       , routing: resolvePath(process.env.CWD, "./lib/routing")

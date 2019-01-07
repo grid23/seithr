@@ -9,9 +9,7 @@ describe("Cookie (legacy tests from  ippankiban)", () => {
         const c = new Cookie({ name: "_foo" })
         const v = Math.random()
 
-        console.log("x", Cookie.events.sync)
         c.addEventListener(Cookie.events.sync, e => {
-            console.log("xxxx")
             expect(!!unescape(document.cookie).match(`_foo={"foo":${v}}`)).to.be.true
             done()
         })
@@ -25,7 +23,6 @@ describe("Cookie (legacy tests from  ippankiban)", () => {
         const v = Math.random()
 
         c.addEventListener(Cookie.events.sync, e => {
-            console.log("xxxx2")
             expect(!!unescape(document.cookie).match(`_bar={"foo":${v}}`)).to.be.true
             done()
         })
