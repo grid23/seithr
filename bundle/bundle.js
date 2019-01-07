@@ -16,6 +16,7 @@ export default async () => new Promise(resolve => {
       , events: resolvePath(process.env.CWD, "./lib/events")
       , models: resolvePath(process.env.CWD, "./lib/models")
       , nodes: resolvePath(process.env.CWD, "./lib/nodes")
+      , routing: resolvePath(process.env.CWD, "./lib/routing")
       , seithr: resolvePath(process.env.CWD, "./lib")
       , serializers: resolvePath(process.env.CWD, "./lib/serializers")
       , store: resolvePath(process.env.CWD, "./lib/store")
