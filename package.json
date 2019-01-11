@@ -2,7 +2,7 @@
   "name": "seithr",
   "version": "0.1.2",
   "scripts": {
-    "prepublishOnly": "npm dist",
+    "prepublishOnly": "npm run dist",
     "start": "NODE_ENV=development node bootstrap --bundle --watch --test",
     "dev": "NODE_ENV=development node bootstrap --bundle --watch",
     "dist": "NODE_ENV=production node bootstrap --bundle",
