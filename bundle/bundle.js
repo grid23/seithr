@@ -2,7 +2,7 @@
 
 import log from "npmlog"
 import substitution from "./substitution"
-import UglifyJsPlugin from "uglifyjs-webpack-plugin"
+import TerserPlugin from "terser-webpack-plugin"
 import { resolve as resolvePath } from "path"
 import webpack from "webpack"
 
@@ -26,9 +26,9 @@ export default async () => new Promise(resolve => {
       , views: resolvePath(process.env.CWD, "./lib/views")
     }
 
-    const entry = process.env.TEST
-    ? { "suite": resolvePath(process.env.CWD, "./specs/suite/index") }
-    : { "seithr": resolvePath(process.env.CWD, "./lib/index") }
+    const entry = JSON.parse(process.env.TEST)
+                ? { "suite": resolvePath(process.env.CWD, "./specs/suite/index") }
+                : { "seithr": resolvePath(process.env.CWD, "./lib/index") }
 
     const config = {
         context: process.env.CWD
@@ -37,8 +37,7 @@ export default async () => new Promise(resolve => {
 
       , entry
 
-      , externals: [
-        ]
+      , externals: []
 
       , module: {
             rules: [
@@ -84,20 +83,24 @@ export default async () => new Promise(resolve => {
 
       , optimization: {
             minimizer: [
-                JSON.parse(process.env.MINIFY) && new UglifyJsPlugin({
-                    cache: true
-                  , parallel: true
-                  , sourceMap: true
-                  , uglifyOptions: { ecma:8 }
-                })
+                // JSON.parse(process.env.DIST) && new TerserPlugin({
+                //     cache: true
+                //   , parallel: true
+                //   , sourceMap: true
+                //   , terserOptions: {
+                //         ecma: 8
+                //     }
+                // })
             ].filter(v => !!v)
        }
 
       , output: {
             filename: "[name].js"
-          , path: process.env.APP_USER_DIR
-          , library: process.env.TEST ? "suite" : "seithr"
-          , libraryTarget: 'var'
+          , path: JSON.parse(process.env.DIST)
+                ? resolvePath(process.env.CWD, "./dist")
+                : process.env.APP_USER_DIR
+          , library: JSON.parse(process.env.TEST) ? "suite" : "seithr"
+          , libraryTarget: JSON.parse(process.env.TEST) ? "var" : "commonjs2"
         }
 
       , plugins: [

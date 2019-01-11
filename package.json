@@ -2,8 +2,12 @@
   "name": "seithr",
   "version": "0.1.1",
   "scripts": {
-    "start": "node bootstrap --bundle --watch --test",
-    "bundle": "node bootstrap --bundle",
+    "prepublishOnly": "npm dist",
+    "start": "NODE_ENV=development node bootstrap --bundle --watch --test",
+
+
+    "dev": "NODE_ENV=development node bootstrap --bundle --watch",
+    "dist": "NODE_ENV=production node bootstrap --bundle",
     "upgrade:check": "npx salita --check",
     "upgrade:install": "npx salita",
     "upgrade:save": "npx salita --update"
@@ -12,7 +16,8 @@
     "log_level": "verbose",
     "port": 1337
   },
-  "browser": "./lib/index.js",
+  "main": "./dist/seithr.js",
+  "browser": "./dist/seithr.js",
   "directories": {
     "lib": "./lib",
     "test": "./specs"
@@ -41,12 +46,12 @@
     "babel-loader": "^8.0.4",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-module-resolver": "^3.1.1",
-    "css-loader": "^2.1.0",
     "chai": "^4.2.0",
+    "css-loader": "^2.1.0",
     "glob-watcher": "^5.0.3",
-    "mocha": "^5.2.0",
     "mime": "^2.4.0",
     "mini-css-extract-plugin": "^0.5.0",
+    "mocha": "^5.2.0",
     "normalize.css": "^8.0.1",
     "npmlog": "^4.1.2",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
@@ -58,7 +63,7 @@
     "postcss-preset-env": "^6.5.0",
     "proxy-polyfill": "^0.3.0",
     "raw-loader": "^1.0.0",
-    "uglifyjs-webpack-plugin": "^2.1.1",
+    "terser-webpack-plugin": "^1.2.1",
     "webpack": "^4.28.3"
   }
 }
