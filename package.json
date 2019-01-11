@@ -1,11 +1,9 @@
 {
   "name": "seithr",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "prepublishOnly": "npm dist",
     "start": "NODE_ENV=development node bootstrap --bundle --watch --test",
-
-
     "dev": "NODE_ENV=development node bootstrap --bundle --watch",
     "dist": "NODE_ENV=production node bootstrap --bundle",
     "upgrade:check": "npx salita --check",
