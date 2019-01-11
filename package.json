@@ -12,7 +12,7 @@
     "log_level": "verbose",
     "port": 1337
   },
-  "browser": "index.js",
+  "browser": "./lib/index.js",
   "directories": {
     "lib": "./lib",
     "test": "./specs"
