@@ -92,17 +92,6 @@ module.exports =
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./lib/store.js
-
-
-/* harmony default export */ var store = (new WeakMap());
-// CONCATENATED MODULE: ./lib/utils/cancelAnimationFrames.js
-
-
-
-/* harmony default export */ var cancelAnimationFrames = (function (generatorFn) {
-  if (store.has(generatorFn)) store.set(generatorFn, false);
-});
 // CONCATENATED MODULE: ./lib/decorators/bound.js
 
 
@@ -225,6 +214,17 @@ var frozen = function frozen(deep, _ref) {
 
 
 
+// CONCATENATED MODULE: ./lib/store.js
+
+
+/* harmony default export */ var store = (new WeakMap());
+// CONCATENATED MODULE: ./lib/utils/cancelAnimationFrames.js
+
+
+
+/* harmony default export */ var cancelAnimationFrames = (function (generatorFn) {
+  if (store.has(generatorFn)) store.set(generatorFn, false);
+});
 // CONCATENATED MODULE: ./lib/errors.js
 
 
@@ -1069,10 +1069,14 @@ var UID_UID = UID_decorate(null, function (_initialize) {
       key: "uid",
       value: function value() {
         var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-            chars = _ref2.chars,
-            map = _ref2.map,
-            radix = _ref2.radix,
-            regexp = _ref2.regexp;
+            _ref2$chars = _ref2.chars,
+            chars = _ref2$chars === void 0 ? UID.CHARS : _ref2$chars,
+            _ref2$map = _ref2.map,
+            map = _ref2$map === void 0 ? UID.MAP : _ref2$map,
+            _ref2$radix = _ref2.radix,
+            radix = _ref2$radix === void 0 ? UID.RADIX : _ref2$radix,
+            _ref2$regexp = _ref2.regexp,
+            regexp = _ref2$regexp === void 0 ? UID.REGEXP : _ref2$regexp;
 
         return new UID({
           chars: chars,
@@ -1589,6 +1593,8 @@ var spath = new Object(Symbol("path"));
 var sseal = new Object(Symbol("seal"));
 var sstrictseal = new Object(Symbol("strictseal"));
 var ssymbol = new Object(Symbol("symbol"));
+var starget = new Object(Symbol("target"));
+var sproxy = new Object(Symbol("proxy"));
 
 var Model_dispatchUpdate = function dispatchUpdate(model, path) {
   return model.dispatchEvent(new ModelChange_ModelChange(path));
@@ -1596,6 +1602,7 @@ var Model_dispatchUpdate = function dispatchUpdate(model, path) {
 
 
 var xref = new Map();
+var proxies = new WeakMap();
 var revocable = null;
 
 var noop = function noop(strictlySealed) {
@@ -1707,10 +1714,14 @@ var revocableProxy = function revocableProxy(model, target, path) {
       revoke = _Proxy$revocable2.revoke,
       proxy = _Proxy$revocable2.proxy;
 
+  proxies.set(proxy, new WeakMap([[starget, target], [sproxy, proxy]]));
   if (revocable) revocable();
 
   revocable = function revocable() {
-    return setTimeout(revoke, 4);
+    return setTimeout(function () {
+      proxies.delete(proxy);
+      revoke();
+    }, 4);
   };
 
   return proxy;
@@ -1752,6 +1763,12 @@ function (_Node) {
     key: "ref",
     value: function ref(_ref) {
       return xref.get(Symbol.for(_ref));
+    }
+  }, {
+    key: "unmask",
+    value: function unmask(proxy) {
+      if (!proxies.has(proxy)) return null;
+      return proxies.get(proxy).get(starget);
     }
   }, {
     key: "io",
@@ -3203,7 +3220,7 @@ const Route_spath = new Object(Symbol())
 const sresponse = new Object(Symbol())
 const srequest = new Object(Symbol())
 const sstate = new Object(Symbol("state"))
-const starget = new Object(Symbol())
+const Route_starget = new Object(Symbol())
 const stimestamp = new Object(Symbol())
 const swait = new Object(Symbol())
 
@@ -3245,7 +3262,7 @@ class Route_Route {
     get response(){ return store.get(this).get(sresponse) }
     get request(){ return store.get(this).get(srequest) }
     get state(){ return store.get(this).get(sstate) || Route_Route.states.UNINITIALIZED }
-    get target(){ return store.get(this).get(starget) }
+    get target(){ return store.get(this).get(Route_starget) }
     get timestamp(){ return store.get(this).get(stimestamp) }
 
 
@@ -3411,7 +3428,7 @@ class RouteDispatcher_RouteDispatcher extends EventTarget_EventTarget {
         store.get(this).set(shits, 0)
 
         store.get(route).set(sstate, Route_Route.states.RUNNING)
-        store.get(route).set(starget, target)
+        store.get(route).set(Route_starget, target)
         store.get(route).set(smatches, {})
         store.get(route).set(stimestamp, Date.now())
         store.get(route).set(shrt, performance.now())
@@ -3833,7 +3850,7 @@ function (_Node) {
       }), acc;
     }, new Map()));
     store.get(View_assertThisInitialized(View_assertThisInitialized(_this))).get(supdates).forEach(function (handlers, updater) {
-      return updater.addEventListener(/* Cannot get final name for export "events" in "./lib/models/Model.js" (known exports: sdata soverflow spath sseal sstrictseal ssymbol default, known reexports: ) */ undefined.modelchange, function () {
+      return updater.addEventListener(Model_Model.events.modelchange, function () {
         return handlers.forEach(function (handler) {
           return handler();
         });
@@ -4042,7 +4059,7 @@ operators.set("[", {
 
     if (attr.indexOf(":") != -1) {
       var split = attr.split(":");
-      attr = split(1);
+      attr = split[1];
       ns = ZParser_Parser.namespaces[split[0].toLowerCase()] || null;
     }
 
@@ -4754,14 +4771,14 @@ function (_Node) {
       if (toType(node) == "string") {
         if (!Stylesheet.isLocalFile(node)) store.get(this).set(swritable, false);
         var href = node;
-        node = ZParser_Parser.parse("link#".concat(store.get(this).get("uid"), "[rel=stylesheet][href=").concat(href, "]")).tree.childNodes[0];
+        node = ZParser_Parser.parse("link#".concat(store.get(this).get(Stylesheet_suid), "[rel=stylesheet][href=").concat(href, "]")).fragment.childNodes[0];
       } else {
-        node = ZParser_Parser.parse("style#".concat(store.get(this).get("uid"))).tree.childNodes[0];
+        node = ZParser_Parser.parse("style#".concat(store.get(this).get(Stylesheet_suid))).fragment.childNodes[0];
         node.appendChild(document.createTextNode(rules.splice(0).join("\n")));
       }
 
       if (dict.media) node.setAttribute("media", dict.media);
-      domready().then(function (_ref) {
+      domready.then(function (_ref) {
         var nodes = _ref.nodes;
         nodes.head.appendChild(node);
         requestAnimationFrame(function (hrt) {
@@ -6291,6 +6308,9 @@ function (_Graph) {
 
 
 // CONCATENATED MODULE: ./lib/index.js
+/* concated harmony reexport bound */__webpack_require__.d(__webpack_exports__, "bound", function() { return bound; });
+/* concated harmony reexport final */__webpack_require__.d(__webpack_exports__, "final", function() { return decorators_final; });
+/* concated harmony reexport frozen */__webpack_require__.d(__webpack_exports__, "frozen", function() { return decorators_frozen; });
 /* concated harmony reexport cancelAnimationFrames */__webpack_require__.d(__webpack_exports__, "cancelAnimationFrames", function() { return cancelAnimationFrames; });
 /* concated harmony reexport Cookie */__webpack_require__.d(__webpack_exports__, "Cookie", function() { return Cookie_Cookie; });
 /* concated harmony reexport CookieSync */__webpack_require__.d(__webpack_exports__, "CookieSync", function() { return Cookie_Sync; });
@@ -6393,6 +6413,7 @@ function (_Graph) {
 
 
 
+
  // graph
 
 
@@ -6409,7 +6430,7 @@ function (_Graph) {
 
 
 
-/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.1.2"));
+/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.1.3"));
 
 /***/ })
 /******/ ]);

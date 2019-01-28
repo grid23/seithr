@@ -96,9 +96,9 @@ export default async () => new Promise(resolve => {
 
       , output: {
             filename: "[name].js"
-          , path: JSON.parse(process.env.DIST)
-                ? resolvePath(process.env.CWD, "./dist")
-                : process.env.APP_USER_DIR
+          , path: JSON.parse(process.env.TEST)
+                ? process.env.APP_USER_DIR
+                : resolvePath(process.env.CWD, "./dist")
           , library: JSON.parse(process.env.TEST) ? "suite" : "seithr"
           , libraryTarget: JSON.parse(process.env.TEST) ? "var" : "commonjs2"
         }
