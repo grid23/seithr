@@ -2357,10 +2357,10 @@ function () {
       var del = this && this.delimiter || def_delimiter;
       var sep = this && this.separator || def_separator;
       void (string.search(sep) != -1 ? string.split(sep) : string.length ? [string] : []).forEach(function (pair) {
-        pair = unescape(pair.replace(rplustospace, "%20"));
+        pair = pair.replace(rplustospace, "%20");
         var idx = pair.indexOf(del);
-        var key = pair.split(del, 1)[0];
-        var value = pair.slice(idx + 1);
+        var key = unescape(pair.split(del, 1)[0]);
+        var value = decodeURIComponent(pair.slice(idx + 1));
         object[key.trim()] = idx != -1 ? value : true;
       });
       return object;
@@ -2380,7 +2380,7 @@ function () {
       var del = this && this.delimiter || def_delimiter;
       var sep = this && this.separator || def_separator;
       return Serializer_toConsumableArray(Object.keys(object).map(function (key) {
-        return "".concat(escape(key)).concat(del).concat(object[key]);
+        return "".concat(key).concat(del).concat(object[key]);
       })).join(sep);
     }
   }]);
@@ -3818,7 +3818,7 @@ function (_Node) {
       return View_expression;
     }
   }, {
-    key: "xWith",
+    key: "xw",
     get: function get() {
       return this.expressWith;
     }
@@ -6430,7 +6430,7 @@ function (_Graph) {
 
 
 
-/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.1.3"));
+/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.1.4"));
 
 /***/ })
 /******/ ]);
