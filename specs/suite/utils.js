@@ -6,7 +6,7 @@ const { expect } = chai
 
 describe("domready", () => {
     it ("it returns a promise, resolved with an object linking to some html nodes", (done) => {
-        domready().then(({ nodes: { documentElement, head, title, viewport, body } }) => {
+        domready.then(({ nodes: { documentElement, head, title, viewport, body } }) => {
             expect( documentElement ).to.be.eql( document.documentElement )
             expect( head ).to.be.eql( document.head )
             expect( title ).to.be.eql( document.head.querySelector("title") )
@@ -16,7 +16,7 @@ describe("domready", () => {
     })
 
     it("is compatible with await/async", async () => {
-        const { nodes: { documentElement, head, title, viewport, body } } = await domready()
+        const { nodes: { documentElement, head, title, viewport, body } } = await domready
         expect( documentElement ).to.be.eql( document.documentElement )
         expect( head ).to.be.eql( document.head )
         expect( title ).to.be.eql( document.head.querySelector("title") )
