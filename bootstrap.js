@@ -23,12 +23,14 @@ const setLog = async () => {
 const main = async () => {
     await setLog()
     log.verbose("bootstrap")
-    require("@babel/polyfill")
+    require("core-js/stable")
+    require("regenerator-runtime/runtime")
     require("@babel/register")({
         presets: [
             ["@babel/preset-env", {
                 spec: true
               , targets: { node: "current" }
+              , corejs: 3
               , useBuiltIns: "entry"
             }]
         ]

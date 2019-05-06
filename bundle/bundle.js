@@ -48,7 +48,10 @@ export default async () => new Promise(resolve => {
                       , options: {
                             cacheDirectory: true
                           , presets: [
-                                ["@babel/preset-env", { targets: { browsers: ["last 2 versions", "ie 11"] } }]
+                                ["@babel/preset-env", {
+                                    corejs: 3
+                                  , useBuiltIns: "entry"
+                                }]
                             ]
                           , plugins: [
                             // Stage 0
