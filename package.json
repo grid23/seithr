@@ -1,6 +1,6 @@
 {
   "name": "seithr",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "scripts": {
     "prepublishOnly": "npm run dist",
     "test": "NODE_ENV=development node bootstrap --bundle --watch --test",
