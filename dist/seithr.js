@@ -1527,15 +1527,12 @@ var revocableMeta = function revocableMeta(model, target, path) {
       revoke = _Proxy$revocable.revoke,
       proxy = _Proxy$revocable.proxy;
 
-  proxies.set(proxy, new WeakMap([[starget, target], [sproxy, proxy]]));
-  if (revocable) revocable();
-
-  revocable = function revocable() {
-    return setTimeout(function () {
-      proxies["delete"](proxy);
-      revoke();
-    }, 4);
-  };
+  proxies.set(proxy, new WeakMap([[starget, target], [sproxy, proxy]])); // if ( revocable )
+  //   revocable()
+  // revocable = () => setTimeout(() => {
+  //     proxies.delete(proxy)
+  //     revoke()
+  // }, 4)
 
   return proxy;
 };
@@ -1604,15 +1601,12 @@ var revocableProxy = function revocableProxy(model, target, path) {
       revoke = _Proxy$revocable2.revoke,
       proxy = _Proxy$revocable2.proxy;
 
-  proxies.set(proxy, new WeakMap([[starget, target], [sproxy, proxy]]));
-  if (revocable) revocable();
-
-  revocable = function revocable() {
-    return setTimeout(function () {
-      proxies["delete"](proxy);
-      revoke();
-    }, 4);
-  };
+  proxies.set(proxy, new WeakMap([[starget, target], [sproxy, proxy]])); // if ( revocable )
+  //   revocable()
+  // revocable = () => setTimeout(() => {
+  //     proxies.delete(proxy)
+  //     revoke()
+  // }, 4)
 
   return proxy;
 }; // export const events = {
@@ -1670,13 +1664,10 @@ function (_Node) {
         }
       }),
           proxy = _Proxy$revocable3.proxy,
-          revoke = _Proxy$revocable3.revoke;
+          revoke = _Proxy$revocable3.revoke; // if ( revocable )
+      //   revocable()
+      // revocable = () => setTimeout(revoke, 4)
 
-      if (revocable) revocable();
-
-      revocable = function revocable() {
-        return setTimeout(revoke, 4);
-      };
 
       return proxy;
     }
@@ -3576,13 +3567,10 @@ var revocableNodeProxy = function revocableNodeProxy(view, target, path) {
 
   var _Proxy$revocable = Proxy.revocable(target, traps),
       revoke = _Proxy$revocable.revoke,
-      proxy = _Proxy$revocable.proxy;
+      proxy = _Proxy$revocable.proxy; // if ( revocable )
+  //   revocable()
+  // revocable = () => setTimeout(revoke, 4)
 
-  if (View_revocable) View_revocable();
-
-  View_revocable = function revocable() {
-    return setTimeout(revoke, 4);
-  };
 
   return proxy;
 };
@@ -6296,7 +6284,7 @@ function (_Graph) {
 
 
 
-/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.1.6"));
+/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.2.0"));
 
 /***/ })
 /******/ ]);
