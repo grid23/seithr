@@ -3540,8 +3540,7 @@ var ssubviewAsChild = new Object(Symbol("subview_as_child"));
 var stemplate = new Object(Symbol("template"));
 var View_suid = new Object(Symbol("uid"));
 var supdates = new Object(Symbol("updates"));
-var xmap = new Map();
-var View_revocable = null;
+var xmap = new Map(); //let revocable = null
 
 var View_noop = function noop(strictlySealed) {
   return function () {
@@ -3589,13 +3588,10 @@ var revocablePropProxy = function revocablePropProxy(view, target, path) {
 
   var _Proxy$revocable2 = Proxy.revocable(target, traps),
       revoke = _Proxy$revocable2.revoke,
-      proxy = _Proxy$revocable2.proxy;
+      proxy = _Proxy$revocable2.proxy; // if ( revocable )
+  //   revocable()
+  // revocable = () => setTimeout(revoke, 4)
 
-  if (View_revocable) View_revocable();
-
-  View_revocable = function revocable() {
-    return setTimeout(revoke, 4);
-  };
 
   return proxy;
 };
@@ -6284,7 +6280,7 @@ function (_Graph) {
 
 
 
-/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.2.0"));
+/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.2.1"));
 
 /***/ })
 /******/ ]);
