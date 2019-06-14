@@ -6280,7 +6280,7 @@ function (_Graph) {
 
 
 
-/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.2.1"));
+/* harmony default export */ var lib = __webpack_exports__["default"] = ("".concat("seithr", "@").concat("0.2.2"));
 
 /***/ })
 /******/ ]);
