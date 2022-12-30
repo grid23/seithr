@@ -51,7 +51,7 @@
     "glob-watcher": "^5.0.3",
     "mime": "^2.4.2",
     "mini-css-extract-plugin": "^0.6.0",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "normalize.css": "^8.0.1",
     "npmlog": "^4.1.2",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
